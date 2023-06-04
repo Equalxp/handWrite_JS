@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise实现</title>
+</head>
+
+<body>
+  <script>
+    function Promise1(executor) {
+      this.PromiseState = 'pending'
+      this.PromiseResult = null
+      //保存this
+      self = this
+      this.callbacks = []
+      //2.resolve函数写参数
+      function resolve(data) {
+        //5.resolve reject只能执行一次 也就是说状态只能更改一次
+        if (self.PromiseState !== 'pending') return
+        //3.改变状态(promiseState) 修改结果(promiseResult)
+        //这里的this指向的是window
+        self.PromiseState = 'fullfilled'
+        self.PromiseResult = data
+        //7.5判断 是否走了then里面的pending 走了callbacks里面就有值
+        self.callbacks.forEach(item => {
+          //then的异步调用
+          item.onResolved()
+        })
+      }
+      //reject 
+      function reject(data) {
+        if (self.PromiseState !== 'pending') return
+        self.PromiseState = 'rejected'
+        self.PromiseResult = data
+        self.callbacks.forEach(item => {
+          item.onRejected()
+        })
+      }
+      try {
+        //1.同步调用 '执行器函数' 参数是两个函数 需要申明
+        executor(resolve, reject);
+      } catch (error) {
+        //4.throw也会改变状态 trycatch接收
+        reject(error)
+      }
+    }
+    Promise1.prototype.then = function (onResolved, onRejected) {
+      //14.异常穿透现象 判断回调函数参数(第二个)
+      if(typeof onRejected !== 'function'){
+        //手动添加一个回调函数
+        onRejected = reason =>{
+          throw reason
+        }
+      }
+      //14值传递
+      if(typeof onResolved !== 'function'){
+        //手动添加一个回调函数
+        onResolved = value =>value
+      }
+      //then方法的返回值是一个promise对象
+      return new Promise((resolve, reject) => {
+        //12封装函数
+        function callback(type) {
+          try {
+            //6.传递参数 执行传进来的函数 //9.获取回调函数执行结果
+            //12.5 this指向问题 this -> window
+            let result = type(self.PromiseResult)
+            if (result instanceof Promise) {
+              //10.返回对象是一个promise 成功状态下
+              result.then(v => {
+                resolve(v)
+              }, r => {
+                reject(v)
+              })
+            } else {
+              resolve(result)
+            }
+          } catch (error) {
+            reject(error)
+          }
+        }
+        //6.调用回调函数 p的状态是成功就走onResolved 失败就onRejected
+        if (this.PromiseState === 'fullfilled') {
+          //then方法的异步调用
+          setTimeout(()=>{
+            callback(onResolved)
+          })
+        }
+        if (this.PromiseState === 'rejected') {
+          // onRejected(this.PromiseResult)
+          //then方法的异步调用
+          setTimeout(()=>{
+            callback(onRejected)
+          })
+        }
+        //7遇到Promise里面的异步代码 不会立即执行 去执行then
+        //但是p的状态没有变化 是pending
+        if (this.PromiseState === 'pending') {
+          //7回调的执行 等定时器里面的resolve执行完 state状态改变之后再执行函数
+          //保存函数 让状态改变时调用
+          //8防止被覆盖then方法可以指定多个回调
+          this.callbacks.push({
+            //11.异步处理 promise then的返回
+            onResolved: function () {
+              //11.5 promise.then方法的回调函数return的是一个success
+              //所以then方法返回的promise对象状态变成了成功
+              let result = onResolved(self.PromiseResult)
+              try {
+                //6.传递参数 执行传进来的函数 //9.获取回调函数执行结果
+                let result = onResolved(this.PromiseResult)
+                if (result instanceof Promise) {
+                  //10.返回对象是一个promise 成功状态下
+                  result.then(v => {
+                    resolve(v)
+                  }, r => {
+                    reject(v)
+                  })
+                } else {
+                  resolve(result)
+                }
+              } catch (error) {
+                reject(error)
+              }
+            },
+            onRejected: function () {
+              callback(onRejected)
+            }
+          });
+        }
+      })
+    }
+    //13.添加catch方法
+    Promise1.prototype.catch = function (onRejected) {
+      return this.then(undefined, onRejected)
+    }
+    //14.添加resolve方法
+    Promise1.resolve = function(value){
+      return new Promise((resolve,reject)=>{
+        if(value instanceof Promise){
+          value.then(v=>{
+            resolve(v)
+          },r=>{
+            reject(r)
+          })
+        }else{
+          resolve(value)
+        }
+      })
+    }
+    //15.添加reject方法
+    Promise1.reject = function(value){
+      return new Promise((resolve,reject)=>{
+        reject(value)
+      })
+    }
+    //16.all方法
+    Promise1.all = function(values){
+      //values是promise数组
+      return new Promise1((resolve,reject)=>{
+        let count = 0
+        // 成功结果数组
+        let arr = []
+        //要求数组里面的promise都是成功 all才返回chengg
+        for(let i =0;i<values.length;i++){
+          values[i].then(v=>{
+            // 成功就调用第一个回调函数
+            count++
+            // 存储对应结果集
+            arr[i] = v
+            if(count == values.length){
+              // 结果集
+              resolve(arr)
+            }
+          },r=>{
+            reject(r)
+          })
+        }
+      })
+    }
+    //17.race方法
+    Promise1.race = function(values){
+      return new Promise1((resolve,reject)=>{
+        for (let i = 0; i < values.length; i++) {
+          values[i].then(v=>{
+            //修改返回对象结果的状态 成功
+            resolve(v)
+          },r=>{
+            //修改返回对象结果的状态 失败
+            reject(r)
+          })
+          
+        }
+      })
+    }
+    
+    let p = new Promise1((resolve, reject) => {
+      setTimeout(() => {
+        resolve('okokok')
+        // reject('error')
+        // throw 'error11111'
+      }, 1000)
+    })
+    let p2 = Promise1.resolve('SuccessSuccess')
+    let p3 = Promise1.resolve('okokokokokokok1')
+    // console.log(p);
+    // let res = p.then(value => {
+    //   console.log(value);
+    //   // return 'sb'
+    //   // return new Promise((resolve, reject) => {
+    //   //   resolve('success')
+    //   // })
+
+    // }, function (err) {
+    //   console.log(err);
+    // })
+    // console.log(res);
+    //异常穿透 值传递
+    // p.then()//()时 定时器那里写resolve
+    // .then(v => {
+    //   //then里面第一个是onresolve 第二个没传是undefined
+    //   console.log(11);
+    // }).then(v => {
+    //   console.log(22);
+    // }).then(v => {
+    //   console.log(333);
+    // }).catch(res => {
+    //   console.warn(res);
+    // })
+    //resolve方法 返回是promise对象 
+    // const p2 = Promise1.resolve(new Promise1((resolve,reject)=>{
+    //   resolve('I\'m ok')
+    // }))
+    // console.log(p2);
+
+    console.log(p2);
+    console.log(p3);
+    //all方法
+    // let result = Promise1.all([p2,p3])
+    //race返回值的状态由最先改变状态的promise的结果决定
+    let result1 = Promise1.race([p,p2,p3])
+    console.log(result1);
+  </script>
+</body>
+
+</html>

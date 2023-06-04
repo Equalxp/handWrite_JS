@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>无缝轮播</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      /* 包装显示区域 wrap */
+      #wrap {
+        /* overflow: hidden; */
+        position: relative;
+        width: 1226px;
+        height: 580px;
+        margin: 100px auto 0;
+      }
+
+      /* 图片list div */
+      #wrap .img-list {
+        display: flex;
+        position: relative;
+        left: 0px;
+        /* 移动的关键 */
+        width: 100%;
+        /* height: 100%; */
+        transition: 0.5s ease;
+      }
+      /* 每一张图片 */
+      #wrap .img-list img {
+        width: 100%;
+        cursor: pointer;
+      }
+
+      #wrap a {
+        position: absolute;
+        top: 50%;
+        transform: translate(0, -50%);
+        display: block;
+        width: 40px;
+        height: 70px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        user-select: none;
+        font-size: 30px;
+        text-align: center;
+        line-height: 70px;
+        text-decoration: none;
+      }
+
+      #wrap a.left {
+        left: 0;
+      }
+
+      #wrap a.right {
+        right: 0;
+      }
+
+      .circle-list {
+        display: flex;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 240px;
+        height: 40px;
+        z-index: 8;
+      }
+
+      .circle-list > .circle {
+        margin: 0 5px;
+        width: 30px;
+        height: 30px;
+        background-color: #ecf0f1;
+        border-radius: 50%;
+      }
+
+      .circle-list > .circle.active {
+        background-color: #e74c3c;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="wrap">
+      <!-- 图片列表 -->
+      <div class="img-list">
+        <img src="https://s1.ax1x.com/2020/09/26/0irm1P.jpg" />
+        <img src="https://s1.ax1x.com/2020/09/26/0irQ0g.jpg" />
+        <img src="https://s1.ax1x.com/2020/09/26/0ir8ts.jpg" />
+        <img src="https://s1.ax1x.com/2020/10/11/0gbKoV.jpg" />
+        <img src="https://s1.ax1x.com/2020/10/11/0gb7Os.jpg" />
+      </div>
+
+      <!-- 小箭头 -->
+      <div class="arrow">
+        <a href="javascript:;" class="left"> <</a>
+        <a href="javascript:;" class="right">></a>
+      </div>
+
+      <!-- 小圆点 -->
+      <ul class="circle-list">
+        <!-- active是小圆点高亮 -->
+        <li class="circle active" data-n="0"></li>
+        <li class="circle" data-n="1"></li>
+        <li class="circle" data-n="2"></li>
+        <li class="circle" data-n="3"></li>
+        <li class="circle" data-n="4"></li>
+      </ul>
+    </div>
+    <script>
+      // 获取左右按钮和图片列表
+      let oLeft = document.querySelector(".left")
+      let oRight = document.querySelector(".right")
+      let oImgList = document.querySelector(".img-list")
+
+      // 克隆第一张图片
+      let clonefirstImg = oImgList.firstElementChild.cloneNode()
+      // 将第一张图片添加至图片列表的末尾
+      oImgList.appendChild(clonefirstImg)
+      // 图片的索引值 代表是第几张图片
+      let index = 0
+      // 函数节流锁 锁最开始是打开的
+      let lock = true
+      function handleRightBtn() {
+        // 如果锁住了 那就return
+        if (!lock) return
+        // 表示图片的索引++
+        index++
+        oImgList.style.left = index * -1226 + "px"
+        //特殊情况 到最后一张图片了 没有图片了 clone了第一张图片在最后
+        //迅速回到第一张 欲盖弥彰的意思
+        //a其他时候加上过渡 切换到最后一张加图
+        oImgList.style.transition = ".5s ease"
+        if (index == 5) {
+          // index = 0
+          // oImgList.style.left = index * -1226 + 'px';
+          // 克隆第一张图片加在最后之后
+          index = 0 // 不能写在定时器里面
+          // ！！！！这个定时器的500ms是留给过渡的500ms
+          // *****500ms之后以无状态回到第一张
+          setTimeout(() => {
+            //先显示假图给你看 但是偷摸开定时器500ms后回到真的第一张 去第一张图片
+            oImgList.style.left = index * 1226 + "px"
+            //消除过渡属性 500ms之后切换第一张 要求只有在index==5才取消过渡
+            oImgList.style.transition = "none "
+          }, 500)
+        }
+        setCircle()
+        //关锁
+        lock = false
+        //500ms之后再打开
+        setTimeout(() => {
+          lock = true
+        }, 500)
+      }
+      //右箭头
+      oRight.addEventListener("click", () => {
+        handleRightBtn()
+      })
+      //左箭头
+      oLeft.addEventListener("click", () => {
+        if (!lock) return
+        index--
+        if (index == -1) {
+          //1.无过渡去最后一张假图
+          oImgList.style.left = 5 * -1226 + "px"
+          oImgList.style.transition = "none "
+          //2.到假图片之后 然后自然过渡到真的最后一张
+          index = 4 //不能写在定时器里面 和小原点移动有关
+          // !!!!无过渡的去最后一假图 然后定时器里 有动画的去真的最后一张
+          //！！！！！瞬间到假图 然后再过渡500ms
+          setTimeout(() => {
+            oImgList.style.left = index * -1226 + "px"
+            oImgList.style.transition = ".5s ease"
+          }, 0)
+        } else {
+          oImgList.style.left = index * -1226 + "px"
+        }
+        setCircle()
+        //关锁
+        lock = false
+        //500ms之后再打开
+        setTimeout(() => {
+          lock = true
+        }, 500)
+      })
+      const circles = document.querySelectorAll(".circle")
+      // console.log(circles);
+      //circle高亮
+      function setCircle() {
+        //item是value index是下标
+        circles.forEach((item, i) => {
+          if (i == index) {
+            //给图片和小圆点相对应起来 加active类名
+            item.classList.add("active")
+          } else {
+            item.classList.remove("active")
+          }
+        })
+      }
+      //小圆点点击切换图片
+      const oCircle = document.querySelector(".circle-list")
+      // console.log(oCircle);
+      // 给父绑定点击事件 事件委托
+      oCircle.addEventListener("click", e => {
+        // console.log(e.target.nodeName);
+        if (e.target.nodeName.toLowerCase() == "li") {
+          //给li加自定义属性 然后获取转化为数字(看控制台数字)
+          const n = Number(e.target.getAttribute("data-n"))
+          //data-n的值和index 一一对应 n作为点击小圆点 小圆点的顺序下标
+          index = n
+          setCircle()
+          oImgList.style.left = index * -1226 + "px"
+        }
+      })
+
+      // const timeout = setInterval(() => {
+      //   handleRightBtn()
+      // }, 2000);
+      const oWrap = document.querySelector("#wrap")
+      oWrap.addEventListener("mouseenter", () => {
+        //清除定时器
+        clearInterval(timeout)
+      })
+      //移除继续轮播
+      oWrap.addEventListener("mouseleave", () => {
+        //清除定时器 ***设表先关 防止事件堆积 移出来就开定时器
+        clearInterval(timeout)
+        timeout = setInterval(() => {
+          handleRightBtn()
+        }, 2000)
+      })
+    </script>
+  </body>
+</html>

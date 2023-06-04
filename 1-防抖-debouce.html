@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+    <title>debounce</title>
+    <style>
+      #container {
+        width: 100%;
+        height: 200px;
+        line-height: 200px;
+        text-align: center;
+        color: #fff;
+        background-color: #444;
+        font-size: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <div id="container"></div>
+      <button id="cancel">点击取消debounce</button>
+    </div>
+    <script>
+      var count = 1
+      var container = document.getElementById("container")
+      //取消按钮
+      var cancel = document.querySelector("#cancel")
+
+      // 防抖函数-1
+      // 1.参数: 回调函数 延迟时间
+      function Lxpdebounce1(func, wait) {
+        let timer = null // "全局" 闭包定义timer
+        // 2.内部实现
+        // 2.1 创建一个经过防抖处理的函数
+        const _debounce = function (...args) {
+          // 指向container
+          // console.log("_debounce的this", this)
+          // 2.2 延迟触发func
+          // 2.3 清除上一次的定时器
+          if (timer) clearTimeout(timer)
+          timer = setTimeout(() => {
+            // 2.5绑定this到container
+            // 2.6函数的参数
+            func.apply(this, args)
+            // 函数执行的位置 独立函数调用 绑定window 执行这个函数时候已经在window下了
+            // func()
+            // 2.4已经触发了 timer重新开始
+            timer = null
+          }, wait)
+        }
+
+        // 3.返回值: 返回一个经过防抖处理的函数
+        // 返回的这个函数绑定给了onmousemove 其中this指向container
+        return _debounce
+      }
+
+      // 取消按钮
+      function Lxpdebounce2(func, wait) {
+        let timer = null
+        const _debounce = function (...args) {
+          if (timer) clearTimeout(timer)
+          timer = setTimeout(() => {
+            func.apply(this, args)
+            timer = null
+          }, wait)
+        }
+        //2.6 给debouce绑定一个取消的函数
+        //在wait事件之中取消掉
+        _debounce.cancel = function () {
+          if (timer) clearTimeout(timer)
+        }
+        return _debounce
+      }
+
+      //立即执行
+      function Lxpdebounce3(func, wait, immediate = false) {
+        let timer = null
+        // 记录立即执行
+        let isInvoke = false
+        const _debounce = function (...args) {
+          if (timer) clearTimeout(timer)
+          // 2.7第一次操作不需要延迟
+          if (immediate && !isInvoke) {
+            func.apply(this, args)
+            // 立即执行之后改成true 表示不立即执行
+            isInvoke = true
+            return
+          }
+          timer = setTimeout(() => {
+            func.apply(this, args)
+            // 都回到最初的状态
+            timer = null
+            isInvoke = false
+          }, wait)
+        }
+        //2.6 给debouce绑定一个取消的函数
+        //在wait事件之中取消掉
+        _debounce.cancel = function () {
+          if (timer) clearTimeout(timer)
+          timer = null
+          isInvoke = false
+        }
+        return _debounce
+      }
+
+      //函数的返回值
+      function Lxpdebounce4(func, wait, immediate = false) {
+        let timer = null
+        // 记录立即执行
+        let isInvoke = false
+        const _debounce = function (...args) {
+          return new Promise((resolve, reject) => {
+            try {
+              if (timer) clearTimeout(timer)
+              // 2.7第一次操作不需要延迟
+              let res = undefined
+              if (immediate && !isInvoke) {
+                res = func.apply(this, args) //要拿到这个的返回值 但是是延迟执行的
+                // 立即执行之后改成true 表示不立即执行
+                resolve(res)
+                isInvoke = true
+                return
+              }
+              timer = setTimeout(() => {
+                res = func.apply(this, args)
+                resolve(res)
+                // 都回到最初的状态
+                timer = null
+                isInvoke = false
+              }, wait)
+            } catch (error) {
+              console.log(error)
+            }
+          })
+        }
+        //2.6 给debouce绑定一个取消的函数
+        //在wait事件之中取消掉
+        _debounce.cancel = function () {
+          if (timer) clearTimeout(timer)
+          timer = null
+          isInvoke = false
+        }
+        return _debounce
+      }
+      
+
+      function getUserAction() {
+        container.innerHTML = count++
+        console.log(this)// 希望这个this 绑定container
+        // 把返回的函数通过debouceFn绑定给了onmousemove 所以Lxpdebounce1里面的this会指向container
+      }
+      // 防抖调用:
+      // 改写成得到返回的函数 再调用 拿到这个返回函数 之后调用其中高德取消函数
+      const debouceFn = Lxpdebounce4(function (event) {
+        // debouceFn 拿到的是返回函数 而不是返回函数的调用
+        container.innerHTML = count++
+        console.log(this) // 希望这个this 绑定container
+        // 把返回的函数通过debouceFn绑定给了onmousemove 所以Lxpdebounce1里面的this会指向container
+        console.log(event);
+        // return 'lxp is SB'
+      }, 1000,false)
+
+      // // // function (...args)
+      // // console.log(debouceFn);
+      // container.onmousemove = debouceFn
+      // container.addEventListener("mousemove", debouceFn)
+      container.onmousemove = debouceFn().then(res => {
+        console.log(res)
+      })
+      cancel.onclick = function () {
+        // 调用取消的功能
+        debouceFn.cancel()
+      }
+
+      // //无防抖:
+      // container.onmousemove = function() {
+      //   getUserAction()
+      //   // this 指向的是container对象
+      //   console.log(this);
+      //   console.log(this.innerHTML);
+      //   console.log(this == container);//true
+      // }
+      // container.addEventListener('mousemove',function(event) {
+      //   getUserAction()
+      //   // 没有经过防抖处理的this 指向的是container对象
+      //   console.log(this);
+      //   console.log(event);
+      //   console.log(this == container);//true
+      // })
+    </script>
+  </body>
+</html>
