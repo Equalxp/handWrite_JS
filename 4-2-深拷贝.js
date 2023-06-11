@@ -24,33 +24,6 @@ function deepClone(oldObj, map = new Map()) {
     return oldObj
   }
 }
-function deepClone1(oldObj, map = new Map()) {
-  if (typeof oldObj === 'object' && oldObj !== null) {
-    // 设置缓存 
-    const cache = map.get(oldObj);
-    // 判断缓存
-    if (cache) {
-      return cache;
-    }
-    // 判断容器 确定类型
-    const isArray = Array.isArray(oldObj)
-    const newObj = isArray ? [] : {}
-    // 1.设置缓存 K-V 在map里面k什么都可以是
-    map.set(oldObj, newObj);
-    if(isArray){
-      oldObj.forEach((item,index)=>{
-        newObj[index] = deepClone1(item,map)
-      })
-    }else{
-      Object.keys(oldObj).forEach((key)=>{
-        newObj[key] = deepClone1(newObj[key],map)
-      })
-    }
-    return newObj
-  } else {
-    return oldObj
-  }
-}
 // 解决循环引用
 const obj = {
   a: 1,

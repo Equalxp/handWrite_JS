@@ -1,159 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #container {
+        width: 100%;
+        height: 200px;
+        line-height: 200px;
+        text-align: center;
+        color: #fff;
+        background-color: #444;
+        font-size: 30px;
+      }
+    </style>
+  </head>
+  <!-- 规定单位事件内 只会触发一次 -->
+  <body>
+    <div id="container"></div>
+    <script>
+      var count = 1
+      var container = document.getElementById("container")
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    #container {
-      width: 100%;
-      height: 200px;
-      line-height: 200px;
-      text-align: center;
-      color: #fff;
-      background-color: #444;
-      font-size: 30px;
-    }
-  </style>
-</head>
+      function getUserAction(event) {
+        container.innerHTML = count++
+        console.log(event)
+      }
 
-<body>
-  <div id="container"></div>
-  <script>
-    var count = 1;
-    var container = document.getElementById('container');
+      // 1-事件戳版本-立即执行控制
+      function lxpThrottle1(fn, interval, leading = true, trailing = false) {
+        // 闭包 定义开始时间点
+        let startTime = 0
+        const _throttle = function (...args) {
+          // 获取当前时间
+          const nowTime = new Date().getTime()
 
-    function getUserAction() {
-      container.innerHTML = count++;
-    };
-    //时间戳版本 会立马执行
-    function throttle(func, wait) {
-      let context, args
-      let pre = 0
-      //上一次的时间戳
-
-      return function () {
-        // 第一次触发的 时间点 now
-        let now = +new Date()
-        context = this
-        args = arguments
-        // 算时间差 上一次触发-这一次触发时间>时间周期 就可以执行
-        if (now - pre > wait) {
-          func.apply(context, args)
-          pre = now
-          // 执行之后 将现在的时间戳设置为上一次
-        }
-      }
-    }
-    //定时器版本
-    function throttle1(func, wait) {
-      let timeout
-      // 上一次触发的时间
-      // 触发事件 就出触发定时器  触发事件 在wait时间里
-      // time都不为空 所以再次触发不会执行函数 要等到wait之后
-      return function () {
-        context = this
-        args = arguments
-        if (!timeout) {
-          //1.先写定时器
-          timeout = setTimeout(function () {
-            //3.设定timeout
-            timeout = null
-            //2.开启定时器 在定时器里面进行func
-            func.apply(context, args)
-          }, wait)
-          //不会立即执行 等待wait之后才会立即执行
-        }
-      }
-    }
-    //结合
-    function throttle2(func, wait) {
-      let timeout, ages, context, result
-      let pre = 0
-      //封装了一下
-      let later = function () {
-        pre = +new Date()//pre的值还是要在这里更新一下
-        timeout = null
-        func.apply(context, args)
-      }
-      return function () {
-        context = this
-        args = arguments
-        let now = +new Date()
-        // 下次触发func的剩余时间
-        let remaining = wait - (now - pre)
-        // if (now - pre > wait) {
-        // 如果没有时间 或者 改了系统时间
-        if (remaining <= 0 || remaining > wait) {
-          //时间戳版本 里面也要清除定时器
-          if (timeout) {
-            //清除定时器
-            clearTimeout(timeout)
-            //置null让下一个 定时器也能执行 再次执行定时器的逻辑
-            timeout = null
-          } 
-          func.apply(context, args)
-          pre = now
-        } else if (!timeout) {
-          timeout = setTimeout(later, remaining)
-        }
-      }
-    }
-    //结合优化版本 是交替来的
-    function throttle3(func, wait, options) {
-      let timeout, ages, context
-      let pre = 0
-      //options 判断用哪种效果
-      if (!options) options = {}
-      //封装了一下
-      let later = function () {
-        // leading为false表示 第一次的不输出
-        // 是一直不走立即执行 所以 pre = 0
-        pre = options.leading === false ? 0 : +new Date()
-        // pre = +new Date()
-        timeout = null
-        func.apply(context, args)
-        if (!timeout) context = args = null
-      }
-      return function () {
-        //时间戳是立即执行版本
-        context = this
-        args = arguments
-        let now = + new Date()
-        //不走立即执行
-        if (!pre && options.leading === false) {
-          pre = now
-        }
-        // 下次触发func的剩余时间
-        let remaining = wait - (now - pre)
-        // if (now - pre > wait) {
-        // 如果没有时间 或者 改了系统时间
-        if (remaining <= 0 || remaining > wait) {
-          //这个是 立即执行
-          if (timeout) {
-            clearTimeout(timeout)
-            timeout = null
+          // 立即执行的控制
+          if (!leading && startTime == 0) {
+            // 不立即执行
+            startTime = nowTime
           }
-          pre = now
-          func.apply(context, args)
-          if (!timeout) context = args = null
-          //optons.trailing !== false表示要走 后一次输出
-        } else if (!timeout && optons.trailing !== false) {
-          //这个是最后才执行
-          timeout = setTimeout(later, remaining)
-        }
-      }
-    }
-    // 第三版
-    // container.onmousemove = throttle1(getUserAction, 3000);
-    container.onmousemove = throttle2(getUserAction, 1000,{
-      leading:true,//代表第一次是否输出
-      trailing:false//代表最后一次是否输出
-    });
-    // 1s内只会触发一次
-  </script>
-</body>
 
+          // 计算得到触发函数需要等待的时间
+          const waitTime = interval - (nowTime - startTime)
+          if (waitTime <= 0) {
+            fn.apply(this, args)
+            // 获取nowTime 这个nowTime就是 这次触发函数的时间点
+            startTime = nowTime
+          }
+        }
+
+        return _throttle
+      }
+
+      // 2-时间戳版本-立即执行控制+尾部控制
+      function lxpThrottle2(fn, interval, leading = true, trailing = true) {
+        // 闭包 定义开始时间点
+        let startTime = 0
+        let timer = null
+        const _throttle = function (...args) {
+          // 获取当前事件
+          const nowTime = new Date().getTime()
+
+          // 立即执行的控制
+          if (!leading && startTime == 0) {
+            // 不立即执行
+            startTime = nowTime
+          }
+
+          // 计算得到触发函数需要等待的时间
+          const waitTime = interval - (nowTime - startTime)
+          if (waitTime <= 0) {
+            if(timer) clearTimeout(timer) // 在wait点执行了 就不需要再开启定时器 防止极端情况
+            fn.apply(this, args)
+            // 获取nowTime 这个nowTime就是 这次触发函数的时间点
+            startTime = nowTime
+            timer = null
+            // 在wait时间点 执行之后 就不需要再开定时器了 直接return
+            return
+          }
+          // 在于用户在哪个时间点停止执行
+          // 是否需要执行尾部 !timer=没有定时器 保证只开启一个定时器
+          if (trailing && !timer) {
+            timer = setTimeout(() => {
+              fn.apply(this, args)
+              // 获取最新的时间
+              startTime = new Date().getTime()
+              timer = null
+            }, waitTime)
+          }
+        }
+
+        return _throttle
+      }
+      container.onmousemove = lxpThrottle2(getUserAction, 1000, true, true)
+
+      // //定时器版本
+      // function throttle1(func, wait) {
+      //   let timeout
+      //   // 上一次触发的时间
+      //   // 触发事件 就出触发定时器  触发事件 在wait时间里
+      //   // time都不为空 所以再次触发不会执行函数 要等到wait之后
+      //   return function () {
+      //     context = this
+      //     args = arguments
+      //     if (!timeout) {
+      //       //1.先写定时器
+      //       timeout = setTimeout(function () {
+      //         //3.设定timeout
+      //         timeout = null
+      //         //2.开启定时器 在定时器里面进行func
+      //         func.apply(context, args)
+      //       }, wait)
+      //       //不会立即执行 等待wait之后才会立即执行
+      //     }
+      //   }
+      // }
+    </script>
+  </body>
 </html>

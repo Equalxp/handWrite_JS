@@ -34,7 +34,7 @@
         let timer = null // "全局" 闭包定义timer
         // 2.内部实现
         // 2.1 创建一个经过防抖处理的函数
-        const _debounce = function (...args) {
+        const _debounce = function (...args) { //调用函数的参数
           // 指向container
           // console.log("_debounce的this", this)
           // 2.2 延迟触发func
@@ -161,6 +161,7 @@
         console.log(event);
         // return 'lxp is SB'
       }, 1000,false)
+      //
 
       // // // function (...args)
       // // console.log(debouceFn);
@@ -176,7 +177,7 @@
 
       // //无防抖:
       // container.onmousemove = function() {
-      //   getUserAction()
+      //=-〔方案選單〕    getUserAction()
       //   // this 指向的是container对象
       //   console.log(this);
       //   console.log(this.innerHTML);

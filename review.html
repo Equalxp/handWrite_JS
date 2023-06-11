@@ -22,60 +22,35 @@
   <div id="container"></div>
   <!-- <script src="debounce.js"></script> -->
   <!-- 1.防抖 -->
-  <!-- <script>
+  <script>
     let count = 1;
     let container = document.querySelector('#container')
-    function getUserAction() {
+    function getUserAction(event) {
       container.innerHTML = count++;
+      console.log(event);
+      console.log(this);
     };
-    function debounce1(func,await){
-      let timeout
-      return function(){
-        let context = this
-        let args = arguments
-        if(timeout) clearTimeout(timeout)
-        timeout = setTimeout(()=>{
-          func.apply(context,args)
-        },await)
+    //1.参数
+    function lxpDebounce1(Fn,wait) {
+      // 3.内部实现 timer闭包
+      let timer = null
+      const _debounce = function(...args) {
+        // 3.1 定时器的设定和清除
+        // 3.2 this的绑定
+        // console.log("debounce的this:",this);
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          Fn.apply(this,args)
+          // Fn()
+        }, wait);
       }
+      
+      // 2.返回值
+      return _debounce
     }
-    //立即执行版本
-    function debounce2(func,await){
-      let timeout
-      return function(){
-        let context = this
-        let args = arguments
-        if(timeout) clearTimeout(timeout)
-        
-        // 1立即执行的标志 没有timeout被开启1
-        let callNow = !timeout
-        timeout = setTimeout(()=>{
-          timeout = null
-        },await)
-
-        if(callNow) func.apply(context,args)
-      }
-    }
-    function debounce3(func,await){
-      let timeout = null
-      let flag = true
-      return function(){
-        let context = this
-        let args = arguments
-        clearTimeout(timeout)
-
-        if(flag){
-          func.apply(context,args)
-          //执行完之后就直接变false 定时器加在flag身上
-          flag = false
-        }
-        timeout = setTimeout(()=>{
-          flag = true
-        },await)
-      }
-    }
-    container.onmousemove = debounce3(getUserAction, 1000);
-  </script> -->
+    // container.onmousemove = getUserAction
+    container.onmousemove = lxpDebounce1(getUserAction,1000)
+  </script>
   <!-- 2.节流 -->
   <!-- <script>
     var count = 1;
@@ -329,45 +304,45 @@
     // heapSort(arr, length)
     // console.log(arr);
 
-    console.log('归并排序---------------------------------------');
-    let arr = [12, 43, 1, 3, 28, 67, 9]
-    function mergeSort(arr, n) {
-      let tempArr = []
-      msort(arr, tempArr, 0, n - 1)
-    }
-    function msort(arr, tempArr, left, right) {
-      if (left < right) {
-        let mid = parseInt((left + right) / 2)
-        msort(arr, tempArr, left, mid)
-        msort(arr, tempArr, mid + 1, right)
-        merge(arr, tempArr, left, mid, right)
-      }
-    }
-    function merge(arr, tempArr, left, mid, right) {
-      let l = left
-      let r = mid + 1
-      let pos = left
-      while (l <= mid && r <= right) {
-        if (arr[l] < arr[r]) {
-          tempArr[pos++] = arr[l++]
-        } else {
-          tempArr[pos++] = arr[r++]
-        }
-      }
-      while (l <= mid) {
-        tempArr[pos++] = arr[l++]
-      }
-      while (r <= right) {
-        tempArr[pos++] = arr[r++]
-      }
-      while (left <= right) {
-        arr[left] = tempArr[left]
-        left++
-      }
-    }
-    length = arr.length
-    mergeSort(arr, length)
-    console.log(arr);
+    // console.log('归并排序---------------------------------------');
+    // let arr = [12, 43, 1, 3, 28, 67, 9]
+    // function mergeSort(arr, n) {
+    //   let tempArr = []
+    //   msort(arr, tempArr, 0, n - 1)
+    // }
+    // function msort(arr, tempArr, left, right) {
+    //   if (left < right) {
+    //     let mid = parseInt((left + right) / 2)
+    //     msort(arr, tempArr, left, mid)
+    //     msort(arr, tempArr, mid + 1, right)
+    //     merge(arr, tempArr, left, mid, right)
+    //   }
+    // }
+    // function merge(arr, tempArr, left, mid, right) {
+    //   let l = left
+    //   let r = mid + 1
+    //   let pos = left
+    //   while (l <= mid && r <= right) {
+    //     if (arr[l] < arr[r]) {
+    //       tempArr[pos++] = arr[l++]
+    //     } else {
+    //       tempArr[pos++] = arr[r++]
+    //     }
+    //   }
+    //   while (l <= mid) {
+    //     tempArr[pos++] = arr[l++]
+    //   }
+    //   while (r <= right) {
+    //     tempArr[pos++] = arr[r++]
+    //   }
+    //   while (left <= right) {
+    //     arr[left] = tempArr[left]
+    //     left++
+    //   }
+    // }
+    // length = arr.length
+    // mergeSort(arr, length)
+    // console.log(arr);
   </script>
 </body>
 
