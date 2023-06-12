@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button class="nav-btn">Nav</button>
+    <script>
+      class lxpEventBus {
+        constructor() {
+          this.evenMap = {}
+        }
+
+        // 事件名 事件回调
+        on(evenName, eventFn) {
+          // 需要存储eventFn这个函数 在不同的地方触发触发事件 回调函数会不相同
+          // 数据结构:{ 'navclick':[eventFn1,eventFn2...] }
+          let eventFns = this.evenMap[evenName]
+          // 第一次是没有数组这个东西的
+          if (!eventFns) {
+            eventFns = []
+            this.evenMap[evenName] = eventFns
+          }
+          eventFns.push(eventFn)
+        }
+
+        emit(evenName, ...args) {
+          // 取出事件名对应的回调函数s
+          let eventFns = this.evenMap[evenName]
+          if (!eventFns) return
+          eventFns.forEach(fn => {
+            // 执行函数
+            fn(...args)
+          })
+        }
+      }
+
+      // 类 eventBus -> 事件总线
+      const eventBus = new lxpEventBus()
+
+      // aside.vue组件
+      eventBus.on("navclick", name => {
+        console.log("navClick 1", name)
+      })
+
+      eventBus.on("navclick", () => {
+        console.log("navClick 2")
+      })
+
+      // nav.vue组件
+      const navBtn = document.querySelector(".nav-btn")
+      navBtn.onclick = function () {
+        console.log("自己的监听")
+        eventBus.emit("navclick", "lxxp")
+      }
+    </script>
+  </body>
+</html>
