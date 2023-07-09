@@ -8,12 +8,14 @@
   <body>
     <button class="nav-btn">Nav</button>
     <script>
+      // 创建一个类
       class lxpEventBus {
         constructor() {
+          // 构造器 准备好一个对象 on emit都共用一个
           this.evenMap = {}
         }
 
-        // 事件名 事件回调
+        // (监听)绑定事件的函数 事件名 事件回调
         on(evenName, eventFn) {
           // 需要存储eventFn这个函数 在不同的地方触发触发事件 回调函数会不相同
           // 数据结构:{ 'navclick':[eventFn1,eventFn2...] }
@@ -21,11 +23,14 @@
           // 第一次是没有数组这个东西的
           if (!eventFns) {
             eventFns = []
+            // 把eventMap对象里面的eventName属性名
+            // 对应的函数们集合成一个数组
             this.evenMap[evenName] = eventFns
           }
           eventFns.push(eventFn)
         }
 
+        // 触发事件的函数
         emit(evenName, ...args) {
           // 取出事件名对应的回调函数s
           let eventFns = this.evenMap[evenName]
@@ -41,6 +46,7 @@
       const eventBus = new lxpEventBus()
 
       // aside.vue组件
+      // 1.监听触发navclick事件 并且绑定回调函数
       eventBus.on("navclick", name => {
         console.log("navClick 1", name)
       })
@@ -53,6 +59,7 @@
       const navBtn = document.querySelector(".nav-btn")
       navBtn.onclick = function () {
         console.log("自己的监听")
+        // 2.点击之后触发navclick事件
         eventBus.emit("navclick", "lxxp")
       }
     </script>

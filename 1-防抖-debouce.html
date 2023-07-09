@@ -41,7 +41,7 @@
           // 2.3 清除上一次的定时器
           if (timer) clearTimeout(timer)
           timer = setTimeout(() => {
-            // 2.5绑定this到container
+            // 2.5希望绑定this到container 1.写箭头函数 2.往上找this
             // 2.6函数的参数
             func.apply(this, args)
             // 函数执行的位置 独立函数调用 绑定window 执行这个函数时候已经在window下了
@@ -177,7 +177,7 @@
 
       // //无防抖:
       // container.onmousemove = function() {
-      //=-〔方案選單〕    getUserAction()
+      //   getUserAction()
       //   // this 指向的是container对象
       //   console.log(this);
       //   console.log(this.innerHTML);

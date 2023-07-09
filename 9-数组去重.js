@@ -1,4 +1,3 @@
-//方法一
 /**
  * for+for
  */
@@ -10,15 +9,12 @@ function unique1(array) {
   // 先加数进res 然后判断res是否有这个数 有就break 没有就加进去
   for (i = 0; i < array.length; i++) {
     for (j = 0; j < res.length; j++) {
-      //如果 array[i] 的值跟 res[j] 的值相等，就跳出循环
-      //如果不等于 那就说明是唯一的值 j就会和res的长度相等
-      //逻辑就是j+1了 就push了一次 
+      // 原数组一一拿出来和结果数组比较
       if (array[i] === res[j]) {
-        break
+        break 
       }
     }
-    // 如果array[i]是唯一的，那么执行完循环 j等于resLen
-    // 只有push进去了 j才++ length也会+1
+    // j和上次的值一样说明没有 === / 如果加了那就不push进去
     if (j === res.length) {
       res.push(array[i])
     }
@@ -64,34 +60,6 @@ function unique3(array) {
   return res
 }
 console.log('3', unique3(array));
-
-
-/**
- * unique 的工具函数 第一版本
- */
-array = [9, 30, 3, 9, 30]
-let array1 = [3, 9, 9, 30, 30]
-function unique4(array, isSorted) {
-  let res = []
-  let seen = []
-  for (let i = 0; i < array.length; i++) {
-    // value属于是当前值 要进行判断是否重复的数
-    const value = array[i];
-    if (isSorted) {
-      if (!i || seen !== value) {
-        res.push(value)
-      }
-      // 给seen赋新的值
-      seen = value
-    } else if (res.indexOf(value) === -1) {
-      res.push(value)
-    }
-  }
-  return res
-}
-console.log('4', unique4(array));
-console.log('5', unique4(array1, true));
-
 
 /**
  * @param array：表示要去重的数组，必填
@@ -149,19 +117,6 @@ function unique6(array) {
 console.log('7', unique6(array));
 
 /**
- * filter 排序去重的方法
- */
-array = [9, 30, 3, 9, 30]
-function unique7(array) {
-  return array.concat().sort().filter(function (item, index, array) {
-    return !index || item !== array[index - 1]
-  })
-}
-
-console.log('8', unique7(array));
-
-
-/**
  * 
  * 利用一个空的 Object 对象
  * 我们把数组的值存成 Object 的 key 值，比如 Object[value1] = true，
@@ -191,17 +146,3 @@ function unique9(array) {
 }
 
 console.log('10',unique9(array)); // [1, 2, "1"]
-
-/**
- * map
- */
-array = [9, 30, 3, 9, 30]
-function unique10 (arr) {
-  const seen = new Map()
-  return arr.filter((a) => !seen.has(a) && seen.set(a, 1))
-}
-
-console.log('11',unique10(array)); // [1, 2, "1"]
-
-
-

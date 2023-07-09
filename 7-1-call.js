@@ -7,6 +7,7 @@ function person(a, b ,c) {
 let cityboy = {
   name: '长谷川',
 }
+// 让调用call方法的函数的 this 指向call里的参数
 // let res = person.call(cityboy)
 // console.log(res);
 // js函数其实都是'Function对象' 'Function'是'构造函数'
@@ -24,7 +25,7 @@ Function.prototype.newCall = function (obj) {
   // 参数
   let newArgs = []
   // arguments是newCall()括号里面的形式参数
-  // console.log(arguments);
+  // console.log(arguments); // 这里newArgs的参数是call函数要接收的第二个参数 也就是穿递给 person函数自身的参数
   for (let i = 1; i < arguments.length; i++) {
     // 参数都添加到数组
     newArgs.push(arguments[i])

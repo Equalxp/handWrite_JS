@@ -27,7 +27,7 @@ Function.prototype.newBind = function (obj,arr) {
   arr = Array.prototype.slice.call(arguments,1)
   /**
    * Array.prototype.slice.call(arguments) slice的this指向arguments
-   * Array.slice => 返回值是数组 slice方法中 ...return result.push(this[i]); 返回一个数组
+   * Array.slice => 返回值是数组 slice方法中 ...end = end || this.length return result.push(this[i]); 返回一个数组
    * this改变到arguments身上了 首先让arguments变成数组 再slice
    */
   // console.log(arr);

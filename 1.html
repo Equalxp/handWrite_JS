@@ -1,0 +1,24 @@
+<body>
+  <div class='box'></div>
+  <script>
+      const box = document.querySelector('.box')
+      const p1 = '<p>一段文字1</p>'
+      const p2 = '<p>一段文字2</p>'
+      // dom渲染 将p1 p2 都渲染到浏览器上
+      box.innerHTML = p1
+      box.innerHTML += p2
+      // alert也是同步任务 没有点击确定就没有执行完毕
+      // dom渲染是在callStack空的时候 尝试渲染
+      // alert('本次CallStack结束 DOM结构更新了 但是没有渲染')
+  
+      //宏任务 DOM渲染之后触发
+      setTimeout(() => {
+        alert('宏任务')
+      })
+      //微任务  DOM渲染之前触发
+      Promise.resolve().then(r => {
+        alert('微任务')
+      })
+      //弹出 微任务 --->  dom渲染  --->   弹出 宏任务
+    </script>
+  </body>

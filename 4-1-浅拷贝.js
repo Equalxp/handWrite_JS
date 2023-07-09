@@ -1,52 +1,35 @@
 
-const info = {
-  name:'lxxxp',
-  age:20,
-  gf:{
-    name:'hyyyy'
-  },
-  fn:()=>{
-    console.log('lxp is SB');
-  },
-  // obj:info
-}
-// 循环引用
-info.obj = info
-
-//1.引用赋值
-// const obj1 = info
-
-//2.浅拷贝
-// const obj1 = {...info}
-// obj1.name = 'lxxp'
-// obj1.gf.name = 'hyy'
-// console.log(info);
-
-// const obj2 = Object.assign({},info)
-// obj2.name = 'lxxp'
-// obj2.gf.name = 'hyy'
-// console.log(info);
-
-//深拷贝 默认没有深拷贝
-//1.JSON
-//转化成字符串 再创建一个全新的对象
-// 对于函数和Symbol 拷贝不了
-// const obj3 = JSON.parse(JSON.stringify(info))
-// console.log(obj3);
-// obj3.gf.name = 'hyy'
-// console.log(info);
-//2.库函数
-
-//3.自己写
-
-const person = {
-  name:'lxxp',
-  age:18,
-  gf:{
-    name:'hyy',
-    bf:{
-      name:'LXP',
-      hobby:'kiss'
+const _shallowClone = (target) => {
+  if (typeof target === 'object' && target !== null) {
+    const constructor = target.constructor
+    // 2.如果是函数、正则、日期、ES6新对象 就返回该参数
+    if (/^(Function|RegExp|Date|Map|Set)$/i.test(constructor.name)) {
+      return target
     }
+    // 3.判断该参数为普通对象或数组并创建相应数据类型的新变量
+    const cloneTarget = Array.isArray(target) ? [] : {}
+    for (prop in target) {
+      if (target.hasOwnProperty(prop)) {
+        // 将对象参数的每一项赋值给新变量
+        cloneTarget[prop] = target[prop]
+      }
+    }
+    return cloneTarget
+  } else {
+    // 1.如果参数不是object/null 直接返回参数
+    return target
   }
 }
+
+const info = {
+  name: 'lxxxp',
+  age: 20,
+  gf: {
+    name: 'hyyyy'
+  },
+  fn: () => {
+    console.log('lxp is SB');
+  }
+  // obj:info
+}
+console.log(_shallowClone(info));

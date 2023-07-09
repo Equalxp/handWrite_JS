@@ -27,25 +27,20 @@
     let container = document.querySelector('#container')
     function getUserAction(event) {
       container.innerHTML = count++;
-      console.log(event);
+      // console.log(event);
       console.log(this);
     };
-    //1.参数
-    function lxpDebounce1(Fn,wait) {
-      // 3.内部实现 timer闭包
+    function lxpDebounce1(func,wait) {
       let timer = null
       const _debounce = function(...args) {
-        // 3.1 定时器的设定和清除
-        // 3.2 this的绑定
-        // console.log("debounce的this:",this);
-        clearTimeout(timer)
+        if(timer) clearTimeout(timer)
         timer = setTimeout(() => {
-          Fn.apply(this,args)
-          // Fn()
+          // 这里的this指向container
+          // console.log(this);
+          func.apply(this,args)
+          timer = null
         }, wait);
       }
-      
-      // 2.返回值
       return _debounce
     }
     // container.onmousemove = getUserAction
