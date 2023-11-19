@@ -8,7 +8,11 @@ const obj = {
   b: [1, 3, { a: 2, b: 3 }],
   c: 3
 }
-
+/**
+ * 
+ * 传入对象的 key 值和 value
+ * 对 value 再进行递归遍历
+ */
 // function isObject(val) {
 //   // 不为空 是对象
 //   return typeof val === 'object' && val !== null;
@@ -53,15 +57,17 @@ function _flatten1(obj) {
       }
     } else if (Array.isArray(value)) { //数组类型
       for (let i = 0; i < value.length; i++) {
+        // 数组名 b[1]...
         process(`${key}[${i}]`, value[i])
       }
       if (value.length === 0) {
         result[key] = [];
       }
     } else {
-      let objArr = Object.keys(value);// 取出key值
+      // 取出全部的key值
+      let objArr = Object.keys(value);
       objArr.forEach(item => {
-        // 第一次调用没有key 
+        // 初始没有key用item作为key item就是第一层key
         process(key ? `${key}.${item}` : `${item}`, value[item])
       });
       if (objArr.length === 0 && key) {

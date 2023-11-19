@@ -6,62 +6,59 @@
     <title>Document</title>
   </head>
   <body>
-    <button class="nav-btn">Nav</button>
     <script>
-      // 创建一个类
-      class lxpEventBus {
+      class eventEmitter {
         constructor() {
-          // 构造器 准备好一个对象 on emit都共用一个
-          this.evenMap = {}
+          this.eventMap = {}
         }
-
-        // (监听)绑定事件的函数 事件名 事件回调
+        // 实现订阅
         on(evenName, eventFn) {
-          // 需要存储eventFn这个函数 在不同的地方触发触发事件 回调函数会不相同
-          // 数据结构:{ 'navclick':[eventFn1,eventFn2...] }
-          let eventFns = this.evenMap[evenName]
-          // 第一次是没有数组这个东西的
+          let eventFns = this.eventMap[evenName]
           if (!eventFns) {
             eventFns = []
-            // 把eventMap对象里面的eventName属性名
-            // 对应的函数们集合成一个数组
-            this.evenMap[evenName] = eventFns
+            this.eventMap[evenName] = eventFns
           }
           eventFns.push(eventFn)
         }
-
-        // 触发事件的函数
+        // 取消订阅
+        off(evenName, eventFn) {
+          if (!this.eventMap[evenName]) {
+            return
+          }
+          this.eventMap[evenName] = this.eventMap[evenName].filter(item => {
+            // 返回的都是 不等于eventFn的函数
+            return item !== eventFn
+          })
+          console.log(this.eventMap[evenName])
+        }
+        // 只执行一次
+        once(evenName, eventFn) {
+          // 要执行也要删除
+          function fn() {
+            eventFn()
+            this.off(evenName, fn)
+          }
+          this.on(evenName, fn)
+        }
+        // 触发订阅 执行里面的函数
         emit(evenName, ...args) {
-          // 取出事件名对应的回调函数s
-          let eventFns = this.evenMap[evenName]
+          // 取出里面的函数
+          let eventFns = this.eventMap[evenName]
           if (!eventFns) return
           eventFns.forEach(fn => {
-            // 执行函数
-            fn(...args)
+            fn.apply(this, args)
           })
         }
       }
-
-      // 类 eventBus -> 事件总线
-      const eventBus = new lxpEventBus()
-
-      // aside.vue组件
-      // 1.监听触发navclick事件 并且绑定回调函数
-      eventBus.on("navclick", name => {
-        console.log("navClick 1", name)
-      })
-
+      const eventBus = new eventEmitter()
       eventBus.on("navclick", () => {
-        console.log("navClick 2")
+        console.log("111")
       })
-
-      // nav.vue组件
-      const navBtn = document.querySelector(".nav-btn")
-      navBtn.onclick = function () {
-        console.log("自己的监听")
-        // 2.点击之后触发navclick事件
-        eventBus.emit("navclick", "lxxp")
-      }
+      eventBus.emit("navclick")
+      eventBus.off("navclick", () => {
+        console.log("111")
+      })
+      eventBus.emit("navclick")
     </script>
   </body>
 </html>

@@ -10,21 +10,26 @@
 
 Object.prototype._create = function (proto) {
   if (typeof proto !== 'object' || proto === null) return
-  const fn = function() {}
+  const fn = function () { }
   fn.prototype = proto
   return new fn()
 }
 
+// x.__proto__ = proto
+Object.prototype._create = function (proto) {
+  if (typeof proto !== 'object' || proto === null) {
+    return
+  }
+  // 中间函数
+  const fn = function() {}
+  fn.prototype = proto
+  return new fn()
+  // new出来的实例的 __proto__ 都会指向proto
+}
+
 var x = Object._create({
-  name:'lxxp'
+  name: 'lxxp'
 })
 
 console.log(x);
 console.log(x.__proto__); //{ name: 'lxxp' }
-
-
-/**
- * new 创造的实例的__proto__ => 构造函数的prototype 自动的
- * create 创造的实例
- * 
- */

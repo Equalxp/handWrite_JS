@@ -8,16 +8,24 @@
  * 3.Person.call(obj) this
  */
 
+// const _new = function (constructor, ...args) {
+//   // const obj = {}
+//   // obj.__proto__ = constructor.prototype
+//   let obj = Object.create(constructor.prototype)
+//   // 借用构造函数
+//   const res = constructor.apply(obj, args)
+//   // res是constructor的返回值 如果构造函数Person没有返回一个对象 就返回新创建的obj
+//   return res instanceof Object ? res : obj
+// }
 const _new = function (constructor, ...args) {
-  // const obj = {}
-  // obj.__proto__ = constructor.prototype
-  let obj = Object.create(constructor.prototype)
-  // 借用构造函数
+  //1.创建空对象
+  const obj = {}
+  //2.prototype链接 
+  obj.__proto__ = constructor.prototype
+  //3.this指向 函数的this指向这个对象
   const res = constructor.apply(obj, args)
-  // res是constructor的返回值 如果构造函数Person没有返回一个对象 就返回新创建的obj
   return res instanceof Object ? res : obj
 }
-
 function Person() {
   this.a = 1
   this.func = () => {

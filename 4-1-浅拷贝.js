@@ -1,4 +1,3 @@
-
 const _shallowClone = (target) => {
   if (typeof target === 'object' && target !== null) {
     const constructor = target.constructor
@@ -33,3 +32,27 @@ const info = {
   // obj:info
 }
 console.log(_shallowClone(info));
+
+
+// Object.assign()
+let obj = {
+  name: 'lxxp'
+}
+const obj1 = Object.assign({}, obj, { name: 'hyyyy' })
+console.log(obj1);
+
+// concat 浅拷贝数组
+let arr = [1, 2, 3];
+// 返回一个新数组
+let newArr = arr.concat();
+newArr[1] = 100;
+console.log(arr);//[ 1, 2, 3 ]
+
+// slice
+let arr1 = [1, 2, 3];
+let newArr1 = arr1.slice();
+newArr1[0] = 100;
+
+console.log(arr1);//[1, 2, 3]
+
+// ... 展开运算符

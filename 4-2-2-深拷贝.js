@@ -10,18 +10,18 @@ function isObject(value) {
 // 执行完之后销毁
 // const map = new Map()
 function _completeDeepClone(target, map = new WeakMap()) {
-  // 如果是symbol
+  // 如果value是symbol
   if (typeof target === 'symbol') {
-    // symbol里面有description
+    // symbol里面有description 新建一个symbol
     return Symbol(target.description)
   }
   // 普通数据类型
   if (!isObject(target)) {
     return target
   }
-  // set
+  // value是set类型的 因为set不能forin遍历
   if (target instanceof Set) {
-    const newSet = new Set()
+    const newSet = new Set() // 新的set
     for (const item of target) {
       // set里面也可能是对象
       newSet.add(_completeDeepClone(item))
@@ -37,8 +37,9 @@ function _completeDeepClone(target, map = new WeakMap()) {
     return map.get(target)
   }
   const cloneTarget = Array.isArray(target) ? [] : {}
-  // 这个{}就是person对象的拷贝对象 让循环引用的self对象指向{}就行
-  map.set(target, cloneTarget) //把拷贝对象提前保存一份
+  // 这个 {} 就是person对象的拷贝对象 让循环引用的self对象指向{}就行
+  // 把拷贝对象提前保存一份到map中
+  map.set(target, cloneTarget)
   for (prop in target) {
     if (target.hasOwnProperty(prop)) {
       cloneTarget[prop] = _completeDeepClone(target[prop], map)
@@ -46,11 +47,10 @@ function _completeDeepClone(target, map = new WeakMap()) {
   }
   // 单独遍历symbol的keys 取出symbol的key组成数组
   const symbolKeys = Object.getOwnPropertySymbols(target)
-  for (const symbolkey of symbolKeys) {
+  for (const symbolKey of symbolKeys) {
     // key要新创建
     cloneTarget[Symbol(symbolkey.description)] = _completeDeepClone(target[symbolkey])
   }
-
   return cloneTarget
 }
 
@@ -79,7 +79,6 @@ const person = {
   // forin不了 key为symbol的值
   [s1]: 'aaa',
   [s2]: 'bbb',
-
 }
 // 5.循环引用
 person.self = person
@@ -94,3 +93,23 @@ console.log(person);
 // true
 console.log(res.symbolKey === person.symbolKey);
 console.log(res.self);
+
+
+/**
+ * const _completeDeepClone = (target, map = new Map()) => {
+ * // 补全代码
+    if(target === null) return target
+    if(typeof target !== 'object') return target
+    const constructor = target.constructor
+    if(/^(Function|RegExp|Date|Map|Set)$/i.test(constructor.name)) return new constructor(target)
+    if(map.get(target)) return map.get(target)
+    map.set(target, true)
+    const cloneTarget = Array.isArray(target) ? [] : {}
+    for(prop in target) {
+        if(target.hasOwnProperty(prop)) {
+            cloneTarget[prop] = _completeDeepClone(target[prop], map)
+        }
+    }
+    return cloneTarget
+  }
+ */

@@ -14,11 +14,18 @@ function render(template, data) {
   // 还有￥{}
   if (reg.test(template)) {
     // match获取key值
-    const key = template.match(reg)[1] //name //match会返回一个匹配的数组
+    // const key = template.match(reg)[1] //name //match会返回一个匹配的数组
+    const keys = template.match(reg)[1] //name //match会返回一个匹配的数组
+    console.log(template.match(reg));
+    /**
+     * keys 第一个是整个正则匹配到的值 ￥{name}
+     * 第二个值是原组的值 name
+     * index input groups
+     */
     // 使用 replace 方法替换变量为真实的数据
-    template = template.replace(reg, data[key])
+    template = template.replace(reg, data[keys])
     // 注意这里的逻辑，递归调用自身，直到字符串中不存在 ${xxx}
-    return render(template, data) //递归
+    // return render(template, data) //递归
   }
   return template
 }

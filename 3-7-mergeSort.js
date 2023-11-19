@@ -7,7 +7,7 @@ function mergeSort(arr, n) {
   //排序 原数据 临时数组 左下标 右下标
   msort(arr, tempArr, 0, n - 1)
 }
-//划分
+//划分(递归)
 function msort(arr, tempArr, left, right) {
   //只有一个元素的时候 不用划分
   if (left < right) {
@@ -20,12 +20,14 @@ function msort(arr, tempArr, left, right) {
     merge(arr, tempArr, left, mid, right)
   }
 }
+
+// 合并函数
 function merge(arr, tempArr, left, mid, right) {
   // 左半区第一个未排序的元素
   let l_pos = left
   // 右半区第一个未排序的元素
   let r_pos = mid + 1
-  // 临时数组的元素的下标
+  // 临时数组的元素的下标 临时数组用于存放已经排序的数
   let pos = left
 
   //合并

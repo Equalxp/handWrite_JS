@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      {
+        // add(1)(2)(3) = 6
+        // add(1,2,3)(4) = 10
+        // add(1)(2)(3)(4)(5) = 15
+
+        function add() {
+          // 类数组转化为数组
+          let args = [...arguments]
+          // 每次多一个()就多一个内部函数 递归
+          let inner = function () {
+            // add()())()..第二个()的参数加到第一个()里面
+            args.push(...arguments)
+            // let sum = args.reduce(function (pre, cur) {
+            //   return pre + cur
+            // })
+            // 一直返回inner函数 调用自己
+            return inner
+          }
+          // 重写toString方法 让返回的内容多元化
+          inner.toString = function () {
+            let sum = args.reduce(function (pre, cur) {
+              return pre + cur
+            })
+            return sum
+          }
+
+          return inner
+        }
+        // 每次多加一个括号就要多加一个函数
+        let result = add(1)(2)(3)
+        console.log(result.toString())
+      }
+
+      {
+        const List = [{ name: "lxxxp" }, { name: "xlbbb" }, { name: "hyyyy" }]
+        const curring = name => element => element[name]
+        // const curring = function (name) {
+        //   return function (element) {
+        //     return element[name]
+        //   }
+        // }
+        // function(element) {
+        //   return element['name']
+        // }
+        const name_ = curring("name")
+        console.log(List.map(name_))
+      }
+      {
+        // function add(x, y, z) {
+        //   console.log(x + y + z);
+        // }
+        // function sum(num1, num2) {
+        //   return num1 + num2
+        // }
+        // // 手写
+        // function lxpCurrying(fn) {
+        //   function curryFn(...args) {
+        //     if (args.length >= fn.length) {
+        //       // 第二类操作-执行函数
+        //       // fn.length fn是函数 length为函数参数的个数
+        //       return fn(...args)
+        //     } else {
+        //       // 第一类操作-返回函数
+        //       return function (...newArgs) {
+        //         return curryFn(...args.concat(newArgs))
+        //       }
+        //     }
+        //   }
+        //   return curryFn
+        // }
+        // let addCurry = lxpCurrying(add)
+        // addCurry(1)(3)(5)
+        // let sumCurry = lxpCurrying(sum)
+        // console.log(sumCurry(8, 1));
+      }
+    </script>
+  </body>
+</html>

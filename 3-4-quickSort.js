@@ -1,15 +1,14 @@
 //快速排序
-let arr = [9, 30, 3, 24, 23, 8, 11, 99]
+let arr = [99, 9, 3, 24, 23, 8, 11, 30]
 /**
+ * 比pivot大的放前面 小的放后面
+ * i 和 j 指针同时指向第一位  pivot为high
  * 
-1、选出一个key,一般是最左边或是最右边的。
-2、起始时,prev指针指向序列开头,cur指针指向prev。
-3、若cur指向的内容小于key,(若第一位就小于key prev和cur都++后移动一位) ,则prev先向后移动一位
-      然后交换prev和cur指针指向的内容,然后cur指针++
-  若cur指向的内容大于key，则cur指针直接++。
-  如此进行下去，直到cur到达end位置，此时将key和++prev(prev指向了key要放的位置)指针指向的内容交换即可。
-
-经过一次单趟排序，最终也能使得key左边的数据全部都小于key，key右边的数据全部都大于key。
+ * i不动 j一位一位往后扫 j<pivot(9<30)、
+ * i和j两个对应的值交换位置 i往后移动一位
+ * 
+ * 重复j往后扫描
+ * 
  * @param  arr 数组
  * @param  low 左边界下标
  * @param  high 右边界下标
@@ -33,7 +32,8 @@ function partition(arr, low, high) {
   let i = low
   for (let j = low; j < high; j++) {
     if (arr[j] < pivot) {
-      // j去找比pivot小的数 j相当于一个指针一直移动 找到之后 i j 元素换位置
+      // j去找比pivot小的数 j相当于一个指针一直移动 找到之后
+      // i j 元素换位置
       // i++ j++
       [arr[i], arr[j]] = [arr[j], arr[i]]
       i++

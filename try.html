@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #div1 {
+        width: 100px;
+        height: 100px;
+        background-color: antiquewhite;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="div1"></div>
+  </body>
+  <script>
+    document.body.onload = addElement
+
+    function addElement() {
+      // 创建一个新的 div 元素
+      // lxp会是一个行内标签
+      const lxp = document.createElement("lxp")
+      const newDiv = document.createElement("div")
+
+      // 给它一些内容
+      let newContent = document.createTextNode("Hi there and greetings!")
+      let newContent1 = document.createTextNode("createElement创造出来的div标签")
+      // 添加文本节点 到这个新的 div 元素
+      lxp.appendChild(newContent)
+      newDiv.appendChild(newContent1)
+
+      // 将这个新的元素和它的文本添加到 DOM 中
+      let currentDiv = document.getElementById("div1")
+      // document.body.insertBefore(newDiv, currentDiv)
+      document.body.insertBefore(lxp, currentDiv)
+    }
+  </script>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const data = [
+        { id: 1, name: "a" },
+        { id: 12, name: "aa", parentId: 1 },
+        { id: 121, name: "aaa", parentId: 12 },
+        { id: 122, name: "aab", parentId: 12 },
+        { id: 2, name: "b" },
+        { id: 22, name: "bb", parentId: 2 },
+        { id: 221, name: "bbb", parentId: 22 },
+        { id: 222, name: "bba", parentId: 22 }
+      ]
+      function toTree(data) {
+        const result = data.reduce((pre, cur, i, arr) => {
+          // 动态的给他添加children啊
+          cur.children = arr.filter(item => {
+            // 过滤出整个数组中有以item的id为parentid的值 
+            return item.parentId === cur.id
+          })
+          if (!cur.parentId) {
+            pre.push(cur)
+          }
+          return pre
+        }, [])
+        return result
+      }
+      console.log(toTree(data))
+    </script>
+  </body>
+</html>

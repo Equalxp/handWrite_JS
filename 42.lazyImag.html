@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    
+    <!-- 自定义属性  -->
+    <img style="display: block" data-src="./syx.jpg" />
+    <img style="display: block" data-src="./sunqian.png" />
+
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+    <p>Life is fucking movie! bro You know what I'm saying</p>
+  </body>
+  <script>
+    {
+      // const images = document.querySelectorAll("img")
+      // window.addEventListener("scroll", e => {
+      //   // 是否出现在可视区
+      //   images.forEach(image => {
+      //     // 图片距离可视区域顶部的距离
+      //     const imageTop = image.getBoundingClientRect().top
+      //     if (imageTop < window.innerHeight) {
+      //       const data_src = image.getAttribute("data-src")
+      //       // 将data-src属性设置为src
+      //       image.setAttribute("src", data_src)
+      //     }
+      //     console.log("scroll触发")
+      //   })
+      // })
+    }
+    // intersectionObserver 交叉观察
+    {
+      const images = document.querySelectorAll("img")
+      
+      // 回调函数
+      const callback = entries => {
+        entries.forEach(entry => {
+          console.log(entry)
+          // 为true的时候就 可以开始加载图片 表示产生了交叉区域
+          if (entry.isIntersecting) {
+            const image = entry.target
+            const data_src = image.getAttribute("data-src")
+            // 将data-src属性设置为src
+            image.setAttribute("src", data_src)
+            // 取消observer的观察动作
+            observer.unobserve(image)
+            console.log("触发")
+          }
+        })
+      }
+
+      // 1.创建实例 + 回调
+      // 目标元素和可视区域产生交叉区域 observer为用于观察的实例
+      // 回调函数 目标元素看见了触发一次 看不见再触发一次
+      const observer = new IntersectionObserver(callback)
+
+      images.forEach(image => {
+        // 去观察每一个 image 这个节点
+        observer.observe(image)
+      })
+    }
+  </script>
+</html>

@@ -135,20 +135,19 @@
         index++
         oImgList.style.left = index * -1226 + "px"
         //特殊情况 到最后一张图片了 没有图片了 clone了第一张图片在最后
-        //迅速回到第一张 欲盖弥彰的意思
-        //a其他时候加上过渡 切换到最后一张加图
+        //其他时候加上过渡 切换到最后一张加图
         oImgList.style.transition = ".5s ease"
         if (index == 5) {
-          // index = 0
+          // index = 0 到第五张的时候 先显示第五张 然后0.5后无过渡到第一张
           // oImgList.style.left = index * -1226 + 'px';
           // 克隆第一张图片加在最后之后
           index = 0 // 不能写在定时器里面
           // ！！！！这个定时器的500ms是留给过渡的500ms
           // *****500ms之后以无状态回到第一张
           setTimeout(() => {
-            //先显示假图给你看 但是偷摸开定时器500ms后回到真的第一张 去第一张图片
+            // 先显示假图给你看 但是偷摸开定时器500ms后回到真的第一张 去第一张图片
             oImgList.style.left = index * 1226 + "px"
-            //消除过渡属性 500ms之后切换第一张 要求只有在index==5才取消过渡
+            // 消除过渡属性 500ms之后切换第一张 要求只有在index==5才取消过渡
             oImgList.style.transition = "none "
           }, 500)
         }
@@ -171,7 +170,7 @@
         if (index == -1) {
           //1.无过渡去最后一张假图
           oImgList.style.left = 5 * -1226 + "px"
-          oImgList.style.transition = "none "
+          oImgList.style.transition = "none"
           //2.到假图片之后 然后自然过渡到真的最后一张
           index = 4 //不能写在定时器里面 和小原点移动有关
           // !!!!无过渡的去最后一假图 然后定时器里 有动画的去真的最后一张

@@ -8,18 +8,19 @@ function _instanceOf(L, R) {
   if (baseType.includes(typeof L)) {
     return false
   }
-
+  // 得到L.__proto__
+  let proto = Object.getPrototypeOf(L)
   while (true) {
     // L为null
-    if (L === null) {
+    if (proto === null) {
       return false
     }
     // 构造函数 的prototype 是否出现在 实例的原型链上
-    if (L.__proto__ === R.prototype) {
+    if (proto === R.prototype) {
       return true
     }
     // 再次往上找
-    L = L.__proto__
+    proto = Object.getPrototypeOf(proto)
   }
 }
 function Person() { }

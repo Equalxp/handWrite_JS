@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 返回一个带有拒绝原因的Promise对象
+      Promise._reject() = function(reason) {
+        return new Promise((resolve,reject) => {
+          reject(reason)
+        })
+      }
+    </script>
+  </body>
+</html>

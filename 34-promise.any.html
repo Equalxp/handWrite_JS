@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 接收一个Promise可迭代对象 只要其中的一个 promise 成功，
+      // 就返回那个已经成功的 promise一个没成功 返回失败的promise
+
+      // 1.参数是空 返回失败
+      // 2.参数里无promise 非Promise值 转换为Promise并当做成功
+      // 3.有一个成功就成功 全部失败就失败
+      Promise._any = function (promises) {
+        return new Promise((resolve, reject) => {
+          if (Array.isArray(promises)) {
+            let err = []
+            let count = 0
+            if (promises.length === 0) {
+              // 
+              reject(new AggregateError("All promises were rejected"))
+            }
+            promises.forEach(item => {
+              // 非promise值 用resolve转为promise
+              Promise.resolve(item).then(
+                value => {
+                  resolve(value)
+                },
+                reason => {
+                  count++
+                  err.push(reason)
+                  // 全都是错误的
+                  count === promises.length && reject(new AggregateError(errors))
+                }
+              )
+            })
+          } else {
+            return reject(new TypeError("Argument is not iterable"))
+          }
+        })
+      }
+      let p1 = new Promise((resolve, reject) => {
+        reject("no")
+      })
+      let p2 = Promise.resolve("okok")
+      let p3 = Promise.reject("nonono")
+
+      const res = Promise._any([p1, p2, p3])
+      console.log(res)
+    </script>
+  </body>
+</html>

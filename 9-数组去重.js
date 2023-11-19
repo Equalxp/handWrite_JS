@@ -14,7 +14,8 @@ function unique1(array) {
         break 
       }
     }
-    // j和上次的值一样说明没有 === / 如果加了那就不push进去
+    // 判断每次循环的result数组是否全都遍历完
+    // 遍历完说明没有重复元素，使用push新增
     if (j === res.length) {
       res.push(array[i])
     }
@@ -31,7 +32,7 @@ function unique2(array) {
   let res = []
   for (let i = 0; i < array.length; i++) {
     const current = array[i];
-    if (res.indexOf(array[i]) === -1) {
+    if (res.indexOf(current) === -1) {
       res.push(current)
     }
   }
@@ -61,77 +62,21 @@ function unique3(array) {
 }
 console.log('3', unique3(array));
 
-/**
- * @param array：表示要去重的数组，必填
- * 
- * @param isSorted：表示函数传入的数组是否已排过序，
- * 如果为 true，将会采用更快的方法进行去重
- * 
- * @param iteratee：传入一个函数，可以对每个元素进行重新的计算，
- * 然后根据处理的结果进行去重
- * 
- * unique 的工具函数 第二版本
- * 字母的大小写视为一致，比如'a'和'A'
- */
-let array2 = [9, 30, 3, 9, 30, 'a', 'A']
-function unique5(array, isSorted, iteratee) {
-  let res = []
-  let seen = []
-  for (let i = 0; i < array2.length; i++) {
-    const value = array2[i];
-    let computed = iteratee ? iteratee(value, i, array) : value
-    if (isSorted) {
-      if (!i || seen !== value) {
-        res.push(value)
-      }
-    } else if (iteratee) {
-      if (seen.indexOf(computed) === -1) {
-        seen.push(computed)
-        res.push(value)
-      }
-    } else if (res.indexOf(value) === -1) {
-      res.push(value)
-    }
-  }
-  return res
-}
-console.log('6', unique5(array2, false, function (item) {
-  return typeof item == 'string' ? item.toLowerCase() : item
-})); // [1, "a", 2]
-
-
 
 /**
- * filter 方法
+ * filter + indexOf
  */
 
 array = [9, 30, 3, 9, 30]
 function unique6(array) {
-  let res = array.filter(function (item, index, array) {
-    // filter 接收函数 返回的是return为true的数据
+  let res = array.filter(function (item, index) {
+    // filter 接收函数 返回的是return为true的数据 
     return array.indexOf(item) === index
-    // indexOf(item) 有这个数的话 就返回数组index下标
+    // indexOf(item) 有这个数的话 返回这个数第一次出现的下标位置
   })
   return res
 }
 console.log('7', unique6(array));
-
-/**
- * 
- * 利用一个空的 Object 对象
- * 我们把数组的值存成 Object 的 key 值，比如 Object[value1] = true，
- * 在判断另一个值的时候，如果 Object[value2]存在的话，就说明该值是重复的。
- */
-
-array = [9, 30, 3, 9, 30]
-function unique8(array) {
-  let obj = {}
-  return array.filter(function(item,index,array){
-    return obj.hasOwnProperty(item) ? false : (obj[item] = true)
-  })
-}
-
-console.log('9', unique8(array));
 
 /**
  * ES6 提供了新的数据结构 Set。它类似于数组，

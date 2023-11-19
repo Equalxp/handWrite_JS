@@ -1,344 +1,250 @@
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1">
-  <title>debounce</title>
-  <style>
-    #container {
-      width: 100%;
-      height: 200px;
-      line-height: 200px;
-      text-align: center;
-      color: #fff;
-      background-color: #444;
-      font-size: 30px;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="container"></div>
-  <!-- <script src="debounce.js"></script> -->
-  <!-- 1.防抖 -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #container {
+        width: 100%;
+        height: 200px;
+        line-height: 200px;
+        text-align: center;
+        color: #fff;
+        background-color: #444;
+        font-size: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div id="container"></div>
+      <button id="cancel">点击取消debounce</button>
+    </div>
+  </body>
+  <!-- 节流 -->
   <script>
-    let count = 1;
-    let container = document.querySelector('#container')
-    function getUserAction(event) {
-      container.innerHTML = count++;
-      // console.log(event);
-      console.log(this);
-    };
-    function lxpDebounce1(func,wait) {
-      let timer = null
-      const _debounce = function(...args) {
-        if(timer) clearTimeout(timer)
-        timer = setTimeout(() => {
-          // 这里的this指向container
-          // console.log(this);
-          func.apply(this,args)
-          timer = null
-        }, wait);
-      }
-      return _debounce
-    }
-    // container.onmousemove = getUserAction
-    container.onmousemove = lxpDebounce1(getUserAction,1000)
+    // let count = 1
+    // const container = document.querySelector("#container")
+    // const cancel = document.querySelector("#cancel")
+
+    // function getUserAction() {
+    //   container.innerHTML = count++
+    //   // 让这个this指向container
+    //   console.log(this)
+    // }
+
+    // // 节流 时间戳
+    // function lxpThrottle1(fn, interval, leading = true) {
+    //   let startTime = 0
+    //   const _throttle = function (...args) {
+    //     const nowTime = new Date().getTime()
+    //     if (!leading && startTime == 0) {
+    //       // 不立即执行
+    //       startTime = nowTime
+    //     }
+    //     const waitTime = interval - (nowTime - startTime)
+    //     if (waitTime <= 0) {
+    //       fn.apply(this, args)
+    //       startTime = nowTime
+    //     }
+    //   }
+    //   return _throttle
+    // }
+
+    // // 节流 定时器版本
+    // function lxpThrottle2(fn, interval) {
+    //   let timer = null
+    //   const _throttle = function (...args) {
+    //     if (timer) {
+    //       return
+    //     }
+    //     timer = setTimeout(() => {
+    //       fn.apply(this, args)
+    //       timer = null
+    //     }, interval)
+    //   }
+    //   return _throttle
+    // }
+    // container.addEventListener("mousemove", lxpThrottle2(getUserAction, 1000, true))
   </script>
-  <!-- 2.节流 -->
-  <!-- <script>
-    var count = 1;
-    var container = document.getElementById('container');
+  <!-- 防抖 -->
+  <script>
+    // let count = 1
+    // const container = document.querySelector("#container")
+    // const cancel = document.querySelector("#cancel")
 
-    function getUserAction() {
-      container.innerHTML = count++;
-    };
+    // // 防抖函数
+    // function Lxpdebounce1(func, wait) {
+    //   let timer = null
+    //   const _debounce = function (...args) {
+    //     if (timer) {
+    //       clearTimeout(timer)
+    //     }
+    //     timer = setTimeout(() => {
+    //       func.apply(this, args)
+    //       timer = null
+    //     }, wait)
+    //   }
+    //   return _debounce
+    // }
 
-    function throttle1(func, wait) {
-      let pre = 0
-      let context, args
-      return function () {
-        let now = +new Date()
-        context = this
-        args = arguments
-        if (now - pre > wait) {
-          func.apply(context, args)
-          pre = now
-        }
+    // // 防抖函数立即执行
+    // function Lxpdebounce2(func, wait, immediate = false) {
+    //   let timer = null
+    //   let isInvoke = false
+    //   const _debounce = function (...args) {
+    //     if (timer) {
+    //       clearTimeout(timer)
+    //     }
+    //     if (immediate && !isInvoke) {
+    //       func.apply(this, args)
+    //       isInvoke = true
+    //       return
+    //     }
+    //     timer = setTimeout(() => {
+    //       func.apply(this, args)
+    //       isInvoke = false
+    //       timer = null
+    //     }, wait)
+    //   }
+    //   return _debounce
+    // }
+    // function getUserAction() {
+    //   container.innerHTML = count++
+    //   // 让这个this指向container
+    //   console.log(this)
+    // }
+
+    // const debouceFn = Lxpdebounce2(getUserAction, 1000, true)
+    // container.addEventListener("mousemove", debouceFn)
+    // // container.addEventListener("mousemove", getUserAction)
+  </script>
+  <!-- promise -->
+  <script>
+    // resolve
+    Promise._resolve = function (value) {
+      if (value instanceof Promise) {
+        return value
+      } else if (value instanceof Object && "then" in value) {
+        return new Promise((resolve, reject) => {
+          value.then(resolve, reject)
+        })
       }
+      return new Promise(resolve => {
+        resolve(value)
+      })
     }
-    function throttle2(func, wait) {
-      let timeout
-      return function () {
-        context = this
-        args = arguments
-        //第一次timeout为空
-        if (!timeout) {
-          timeout = setTimeout(() => {
-            timeout = null
-            func.apply(context, args)
-          }, wait)
-        }
-      }
+    // reject
+    Promise._reject = function (value) {
+      return new Promise((resolve, reject) => {
+        reject(value)
+      })
     }
-    function throttle3(func, wait) {
-      let timeout, args, context
-      let pre = 0
-      let later = function () {
-        pre = +new Date()
-        timeout = null
-        func.apply(context, args)
-      }
-      return function () {
-        context = this
-        args = arguments
-        let now = + new Date()
-        let remaining = now - pre
-        if (remaining <= 0 || remaining > wait) {
-          if (timeout) {
-            clearTimeout(timeout)
-            timeout = null
+    // all 是不是数组/长度==0/是不是promise
+    Promise._all = function (promises) {
+      return new Promise((resolve, reject) => {
+        if (Array.isArray(promises)) {
+          let count = 0
+          let res = []
+          if (promises.length === 0) {
+            return resolve(promises)
           }
-          func.apply(context, args)
-          pre = now
+          promises.forEach((item, index) => {
+            if (item instanceof Promise) {
+              Promise.resolve(item).then(
+                value => {
+                  count++
+                  res[index++] = value
+                  count === promises.length && resolve(res)
+                },
+                reason => {
+                  reject(reason)
+                }
+              )
+            } else {
+              count++
+              res[index++] = item
+              count === promises.length && resolve(res)
+            }
+          })
         } else {
-          timeout = setTimeout(
-            // () => {
-            //   pre = +new Date()
-            //   timeout = null
-            //   func.apply(context, args)
-            // },
-            later,
-            remaining)
+          return reject(new TypeError("arguments is not iterable"))
         }
-      }
+      })
     }
-    function throttle4(func, wait, options) {
-      let timeout, context, args, result
-      let pre = 0
-      if (!options) options = {}
-
-      let later = function () {
-        pre = options.leading === false ? 0 : +new Data()
-        timeout = null
-        func.apply(context, args)
-        if (!timeout) context = args = null;
-      }
-
-      return function () {
-        let now = +new Date()
-        if (!pre && options.leading === false) {
-          pre = now
-        }
-        let remaining = wait - (now - pre)
-        context = this
-        args = arguments
-        if (remaining <= 0 || remaining > wait) {
-          if (timeout) {
-            clearTimeout(timeout)
-            timeout = null
+    // any
+    Promise._any = function (promises) {
+      return new Promise((resolve, reject) => {
+        if (Array.isArray(promises)) {
+          let count = 0
+          let err = []
+          if (promises.length === 0) {
+            reject(new AggregateError("All promises were rejected"))
           }
-          pre = now
-          func.apply(context, args);
-          if (!timeout) context = args = null
-        } else if (!timeout && options.trailing !== false) {
-          timeout = setTimeout(later, remaining)
+          promises.forEach((item, index) => {
+            Promise.resolve(item).then(
+              value => {
+                resolve(value)
+              },
+              reason => {
+                count++
+                err.push(reason)
+                count === promises.length && reject(new AggregateError(err))
+              }
+            )
+          })
+        } else {
+          return reject(new TypeError("Argument is not iterable"))
         }
-      }
+      })
     }
-    container.onmousemove = throttle2(getUserAction, 3000)
-  </script> -->
-  <!-- 3.排序 -->
-  <script>
-    // console.log('冒泡---------------------------------------');
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // function Bubble(arr) {
-    //   let i, j
-    //   //排6趟
-    //   for (i = 0; i < arr.length - 1; i++) {
-    //     for (j = 0; j < arr.length - 1 - i; j++) {
-    //       if (arr[j] > arr[j + 1]) {
-    //         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
-    //       }
-    //     }
-    //   }
-    // }
-    // Bubble(arr)
-    // console.log(arr);
-    // console.log('选择---------------------------------------');
-    // //相邻两个相比较 小的放前面
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // function selectSort(arr){
-    //   let length = arr.length
-    //   let minIndex
-    //   for(let i =0;i<length-1;i++){
-    //     minIndex = i
-    //     //j要选到最后
-    //     for(let j = i+1;j<length;j++){
-    //       if(arr[j]<arr[minIndex]){
-    //         minIndex = j
-    //       }
-    //     }
-    //     [arr[minIndex],arr[i]]=[arr[i],arr[minIndex]]
-    //   }
-    // }
-    // selectSort(arr)
-    // console.log(arr);
-    // console.log('插入---------------------------------------');
-    // // 开始是相邻两个 从第二个数开始
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // let length = arr.length
-    // function insertSort(arr) {
-    //   for (i = 1; i < length; i++) {
-    //     let temp = arr[i]
-    //     let j = i - 1
-    //     // 前面这个数大于后面这个数 
-    //     while (j >= 0 && arr[j] > temp) {
-    //       arr[j + 1] = arr[j]
-    //       j--
-    //     }
-    //     arr[j + 1] = temp
-    //     console.log(arr);
-    //   }
-    // }
-    // insertSort(arr)
-    // arr.forEach(element => {
-    //   console.log(element);
-    // });
-    // console.log('快速---------------------------------------');
-    // //pivot
-    // function qSort(arr, left, right) {
-    //   if (left < right) {
-    //     //mid是已经到达了正确位置的元素的下标
-    //     let mid = partition(arr, left, right)
-    //     qSort(arr, left, mid - 1)
-    //     qSort(arr, mid + 1, right)
-    //   }
-    // }
-    // function partition(arr, left, right) {
-    //   let pivot = arr[right]
-    //   let i = left
-    //   for (j = left; j < right; j++) {
-    //     if (arr[j] < pivot) {
-    //       [arr[j], arr[i]] = [arr[i], arr[j]]
-    //       i++
-    //     }
-    //   }
-    //   [arr[right], arr[i]] = [arr[i], arr[right]]
-    //   // console.log(arr);
-    //   return i
-    // }
-    // function quickSort(arr) {
-    //   //递归
-    //   let length = arr.length
-    //   qSort(arr, 0, length - 1)
-    // }
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // quickSort(arr)
-    // arr.forEach(element => {
-    //   console.log(element);
-    // });
+    // race
+    Promise._race = function (promises) {
+      return new Promise((resolve, reject) => {
+        if (Array.isArray(promises)) {
+          if (promises.length > 0) {
+            promises.forEach(item => {
+              Promise.resolve(item).then(
+                value => {
+                  resolve(value)
+                },
+                reason => {
+                  reject(reason)
+                }
+              )
+            })
+          }
+        } else {
+          return reject(new TypeError("Argument is not iterable"))
+        }
+      })
+    }
+    const p = new Promise((resolve, reject) => {
+      resolve("ok")
+    })
+    const p1 = Promise.resolve({
+      then: function (onFulfill) {
+        onFulfill("Resolveing")
+      }
+    })
+    // 测试resolve
+    // const res = Promise._resolve(p1)
+    // console.log(res)
 
-    // console.log('shell---------------------------------------');
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // //控制增量法
-    // function shellSort(arr, n) {
-    //   let i, j, key, inc
-    //   for (inc = parseInt(n / 2); inc > 0; inc = parseInt(inc / 2)) {
-    //     //insertSort
-    //     for (i = inc; i < n; i++) {
-    //       key = arr[i]
-    //       j = i - inc
-    //       while (j >= 0 && arr[j] > key) {
-    //         arr[j + inc] = arr[j]
-    //         j = j - inc
-    //       }
-    //       arr[j + inc] = key
-    //     }
-    //   }
-    // }
-    // console.log(arr);
-    // //直接传length
-    // shellSort(arr,arr.length)
-    // arr.forEach(element => {
-    //   console.log(element);
-    // });
-
-    // console.log('堆排序---------------------------------------');
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // //数组 数组长度 待维护的数组下标
-    // function heapify(arr, length, index) {
-    //   let fa = index
-    //   let lson = index * 2 + 1
-    //   let rson = index * 2 + 2
-    //   if (lson < length && arr[fa] < arr[lson]) {
-    //     fa = lson
-    //   }
-    //   if (rson < length && arr[fa] < arr[rson]) {
-    //     fa = rson
-    //   }
-    //   if (fa != index) {
-    //     [arr[fa], arr[index]] = [arr[index], arr[fa]]
-    //     heapify(arr, length, fa)
-    //   }
-    // }
-    // function heapSort(arr, n) {
-    //   // 最后一个下标元素的父节点
-    //   for (let i = parseInt(n / 2) - 1; i >= 0; i--) {
-    //     heapify(arr, n,i)
-    //   }
-
-    //   //大顶堆 开始排序
-    //   for (i = n - 1; i > 0; i--) {
-    //     [arr[i], arr[0]] = [arr[0], arr[i]]
-    //     heapify(arr, i, 0)
-    //   }
-    // }
-    // length = arr.length
-    // heapSort(arr, length)
-    // console.log(arr);
-
-    // console.log('归并排序---------------------------------------');
-    // let arr = [12, 43, 1, 3, 28, 67, 9]
-    // function mergeSort(arr, n) {
-    //   let tempArr = []
-    //   msort(arr, tempArr, 0, n - 1)
-    // }
-    // function msort(arr, tempArr, left, right) {
-    //   if (left < right) {
-    //     let mid = parseInt((left + right) / 2)
-    //     msort(arr, tempArr, left, mid)
-    //     msort(arr, tempArr, mid + 1, right)
-    //     merge(arr, tempArr, left, mid, right)
-    //   }
-    // }
-    // function merge(arr, tempArr, left, mid, right) {
-    //   let l = left
-    //   let r = mid + 1
-    //   let pos = left
-    //   while (l <= mid && r <= right) {
-    //     if (arr[l] < arr[r]) {
-    //       tempArr[pos++] = arr[l++]
-    //     } else {
-    //       tempArr[pos++] = arr[r++]
-    //     }
-    //   }
-    //   while (l <= mid) {
-    //     tempArr[pos++] = arr[l++]
-    //   }
-    //   while (r <= right) {
-    //     tempArr[pos++] = arr[r++]
-    //   }
-    //   while (left <= right) {
-    //     arr[left] = tempArr[left]
-    //     left++
-    //   }
-    // }
-    // length = arr.length
-    // mergeSort(arr, length)
-    // console.log(arr);
+    const p2 = Promise.resolve("resolve")
+    const p3 = Promise.resolve("resolve")
+    const p4 = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("ok")
+      }, 1000)
+    })
+    const p5 = Promise.reject("no")
+    const p6 = Promise.reject("nono")
+    // 测试all
+    // let result = Promise._all([p1, p2, p3, 11])
+    // 测试any
+    let result = Promise._any([p5, p6])
+    console.log(result)
   </script>
-</body>
-
 </html>

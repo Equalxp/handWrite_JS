@@ -14,9 +14,8 @@ class eventEmitter {
   }
   // 实现订阅
   on(evenName, eventFn) {
-    // 取出订阅这个事件名的回调们
     let eventFns = this.eventMap[evenName]
-    if (!eventFns) { // 空
+    if (!eventFns) {
       eventFns = []
       this.eventMap[evenName] = eventFns
     }

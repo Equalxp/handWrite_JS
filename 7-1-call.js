@@ -11,7 +11,7 @@ let cityboy = {
 // let res = person.call(cityboy)
 // console.log(res);
 // js函数其实都是'Function对象' 'Function'是'构造函数'
-// Funtion(构造函数)  --(new)-->  function f()  --(__proto__) -->  Function.prototype (原型对象)
+// Funtion(构造函数)  --(new)-->  function f() --> (__proto__) -->  Function.prototype (原型对象)
 //'构造函数'有'原型对象' ---> Function.prototype (call就存在于此)
 Function.prototype.newCall = function (obj) {
   // 特殊情况 没传就指向全局
@@ -40,4 +40,3 @@ Function.prototype.newCall = function (obj) {
 }
 let res = person.newCall(cityboy,'beams','nautica','converse')
 console.log('return返回结果:',res);
-
